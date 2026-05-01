@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiverse Patcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#0e0e12!important;color:#eeeef8!important;font-family:'Inter',system-ui,sans-serif!important;font-size:14px;color-scheme:dark}
+#hdr{background:#111118!important;border-bottom:2px solid #f0a030;padding:5px 12px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:300}
+.htitle{font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#f0a030;white-space:nowrap}
+.htitle span{color:#fff}
+#fname{font-family:'JetBrains Mono',monospace;font-size:12px;color:#999;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 8px}
+.mwrap{position:relative}
+.mbtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:5px 14px;border-radius:3px;border:1px solid #f0a030;background:transparent;color:#f0a030;cursor:pointer;display:flex;align-items:center;gap:6px}
+.mbtn:hover,.mbtn.open{background:#f0a030;color:#000}
+.mdrop{position:absolute;top:calc(100% + 4px);right:0;background:#18181f;border:1px solid #f0a030;border-radius:4px;min-width:220px;z-index:400;display:none;box-shadow:0 6px 24px rgba(0,0,0,.7);overflow:hidden}
+.mdrop.open{display:block}
+.mitem{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #1e1e2a;font-size:13px;color:#eee;white-space:nowrap}
+.mitem:last-child{border-bottom:none}
+.mitem:hover{background:#1a1a2a}
+.mitem .mic{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.mitem .msub{font-family:'JetBrains Mono',monospace;font-size:10px;color:#666;margin-left:auto}
+.msep{border-top:1px solid #2a2a3a;margin:2px 0}
+#vtabs{background:#111118;border-bottom:1px solid #2a2a3a;display:flex;position:sticky;top:37px;z-index:195}
+.vtab{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:7px 18px;cursor:pointer;color:#999;border-bottom:2px solid transparent;border-right:1px solid #1e1e2a;white-space:nowrap;user-select:none}
+.vtab:last-child{border-right:none}
+.vtab.act{color:#f0a030;border-bottom-color:#f0a030;background:#0e0e12}
+.vtab:hover:not(.act){color:#ddd}
+.view{display:none}.view.act{display:block}
+#controls-bar{position:sticky;top:59px;z-index:190;background:#0e0e12}
+#toolbar{background:#18181f;border-bottom:1px solid #2a2a3a;padding:4px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tl{font-family:'JetBrains Mono',monospace;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px}
+.tbtn{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 9px;border-radius:3px;border:1px solid #333;background:#0e0e12!important;color:#bbb;cursor:pointer;user-select:none}
+.tbtn:hover,.tbtn.act{border-color:#f0a030;color:#f0a030;background:#1a1500!important}
+#jumpbar{background:#16161e;border-bottom:1px solid #1e1e2a;padding:4px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#ji{background:#0e0e12!important;border:1px solid #333;color:#f0a030!important;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:3px 8px;border-radius:3px;width:70px;text-align:center;outline:none}
+#ji:focus{border-color:#f0a030}
+.jbtn{font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 10px;border-radius:3px;border:1px solid #333;background:#0e0e12!important;color:#bbb;cursor:pointer}
+.jbtn:hover{border-color:#f0a030;color:#f0a030}
+#wrap{padding-bottom:56px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead th{font-family:'JetBrains Mono',monospace;font-size:11px;color:#ccc;letter-spacing:1px;text-transform:uppercase;padding:6px 6px;text-align:left;border-bottom:2px solid #2a2a3a;background:#0e0e12!important;white-space:nowrap}
+thead th.tc{text-align:center}
+.th-sub{font-size:9px;color:#666;display:block;letter-spacing:0;text-transform:none}
+tbody tr{border-bottom:1px solid #1e1e28}
+tbody tr:nth-child(odd){background:#0b0b10!important}
+tbody tr:nth-child(even){background:#171724!important}
+tbody tr:hover{background:#20203a!important}
+tbody tr.used:nth-child(odd){background:#081208!important}
+tbody tr.used:nth-child(even){background:#142014!important}
+tbody tr.used:hover{background:#141f14!important}
+tbody tr.hl{outline:2px solid #f0a030;outline-offset:-1px;background:#1a1500!important}
+td{padding:3px 5px;vertical-align:middle;overflow:hidden}
+td.c-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#666;text-align:center;cursor:pointer;user-select:none;width:46px}
+td.c-num.on{color:#f0a030}
+.li{background:transparent;border:none;color:#eee;font-family:'Inter',sans-serif;font-size:13px;width:100%;outline:none;padding:2px 4px;font-weight:600}
+.li:focus,.li:hover{background:#1a1a28;border-radius:2px}
+.li::placeholder{color:#555;font-size:12px}
+.ai{background:#111118!important;border:1px solid #2a2a38;color:#ccc!important;font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 5px;border-radius:2px;width:100%;outline:none;text-align:center}
+.ai:focus{border-color:#f0a030;color:#fff!important}
+.ai.ef{color:#30b8f0!important;border-color:#1a2a3a}
+.ai.vf{color:#30e878!important;border-color:#30e87844}
+.fw{position:relative}
+.fi{background:#111118!important;border:1px solid #2a2a38;color:#30b8f0!important;font-family:'Inter',sans-serif;font-size:13px;width:100%;outline:none;padding:2px 4px;border-radius:2px}
+.fi:focus{border-color:#30b8f0;background:#0e1a24!important}
+.fi::placeholder{color:#446;font-size:12px}
+.acdrop{position:fixed;background:#18181f;border:1px solid #30b8f0;border-radius:4px;max-height:260px;overflow-y:auto;min-width:340px;max-width:480px;display:none;box-shadow:0 8px 32px rgba(0,0,0,.9);z-index:9999}
+.acdrop.open{display:block}
+.acitem{padding:7px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid #1a1a2a;white-space:nowrap;color:#ccc}
+.acitem:hover{background:#1a2a3a;color:#30b8f0}
+.acmfr{color:#666;font-size:11px;display:inline-block;width:100px}
+.acch{color:#888;font-size:11px;float:right;margin-left:8px}
+.acmode{color:#666;font-size:10px;font-family:'JetBrains Mono',monospace;margin-left:6px}
+.acnone{padding:8px 12px;color:#666;font-size:12px}
+.end-cell{font-family:'JetBrains Mono',monospace;font-size:11px;color:#777;text-align:center}
+#sb{position:fixed;bottom:28px;left:0;right:0;background:#111118!important;border-top:1px solid #2a2a3a;padding:4px 12px;display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:100}
+.ss{color:#999}.ss b{color:#eee}
+.uleg{display:flex;gap:6px;margin-left:auto}
+.ulegitem{display:flex;align-items:center;gap:3px;font-size:11px}
+.udot{width:8px;height:8px;border-radius:50%}
+#nav{position:fixed;bottom:0;left:0;right:0;background:#0e0e12;border-top:1px solid #1a1a22;padding:3px 12px;display:flex;align-items:center;z-index:101}
+.nv{font-family:'JetBrains Mono',monospace;font-size:12px;color:#888;cursor:pointer;padding:3px 14px;border-right:1px solid #1a1a22;user-select:none}
+.nv:last-child{border-right:none}
+.nv:hover{color:#f0a030}
+#umap-eos,#umap-venue{padding:12px 14px 56px}
+.umap-tabbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.umaptab{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;border-radius:3px;border:1px solid #333;background:#0e0e12!important;color:#999;cursor:pointer}
+.umaptab.act{font-weight:700}
+.umap-legend{display:flex;gap:16px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#aaa}
+.leg-sw{width:16px;height:16px;border-radius:2px;flex-shrink:0}
+.ugrid-wrap{overflow-x:auto}
+.umap-utitle{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-bottom:4px}
+.umap-usub{font-family:'JetBrains Mono',monospace;font-size:11px;color:#888;margin-bottom:12px}
+.ugrid{display:grid;grid-template-columns:44px repeat(32,28px);gap:2px;min-width:980px;margin-bottom:20px}
+.ugh{font-family:'JetBrains Mono',monospace;font-size:10px;color:#777;text-align:center;height:18px;display:flex;align-items:center;justify-content:center}
+.ugc{width:28px;height:28px;border-radius:2px;position:relative;cursor:default;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600}
+.ugc.empty{background:#111118;border:1px solid #1c1c1c}
+.ugc.filled{border:1px solid}
+.ugc:hover .ugtt{display:block}
+.ugtt{display:none;position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#18181f;border:1px solid #2a2a3a;border-radius:3px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#eee;white-space:nowrap;z-index:600;pointer-events:none;line-height:1.7}
+.umap-empty-msg{font-family:'JetBrains Mono',monospace;font-size:13px;color:#666;padding:20px 0}
+#toast{position:fixed;bottom:44px;right:14px;background:#30e878;color:#000;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;padding:7px 14px;border-radius:4px;opacity:0;transform:translateY(6px);transition:all .25s;pointer-events:none;z-index:999}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.err{background:#f03020;color:#fff}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:#0e0e12}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div id="hdr">
+  <div class="htitle">MULTIVERSE <span>PATCHER</span></div>
+  <span id="fname">No file open</span>
+  <span id="fx-status" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#555;margin-left:8px"></span>
+  <div class="mwrap">
+    <button class="mbtn" id="mbtn" onclick="toggleMenu()">PATCH ▾</button>
+    <div class="mdrop" id="mdrop">
+      <div class="mitem" onclick="menuDo(newPatch)"><span class="mic">✦</span>New Patch<span class="msub">clears all</span></div>
+      <div class="mitem" onclick="menuDo(openPatch)"><span class="mic">📂</span>Open…<span class="msub">.mvp</span></div>
+      <div class="mitem" onclick="menuDo(importEosTrigger)"><span class="mic">⬇</span>Import Eos Patch…<span class="msub">.csv</span></div>
+      <div class="msep"></div>
+      <div class="mitem" onclick="menuDo(saveAs)"><span class="mic">💾</span>Save As…<span class="msub">download</span></div>
+      <div class="mitem" onclick="menuDo(makeCopy)"><span class="mic">⧉</span>Make a Copy…</div>
+      <div class="msep"></div>
+      <div class="mitem" onclick="menuDo(genQLC)"><span class="mic">◈</span>Generate QLC+ File<span class="msub">.qxw</span></div>
+      <div class="mitem" onclick="menuDo(genReport)"><span class="mic">📋</span>Report / PDF</div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW TABS -->
+
+<div id="vtabs">
+  <div class="vtab act" id="vt-patch" onclick="showView('patch')">Patch</div>
+  <div class="vtab" id="vt-eos"   onclick="showView('eos')">Eos Universes</div>
+  <div class="vtab" id="vt-venue" onclick="showView('venue')">Venue Universes</div>
+</div>
+
+<!-- ══ ALWAYS VISIBLE CONTROLS ══════════════ -->
+
+<div id="controls-bar">
+  <div id="toolbar">
+    <span class="tl">Show:</span>
+    <button class="tbtn act" id="fa" onclick="setF('all')">All 1024</button>
+    <button class="tbtn" id="fu" onclick="setF('used')">Patched</button>
+    <button class="tbtn" id="fn" onclick="setF('none')">Unpatched</button>
+    <span class="tl" style="margin-left:8px">Universe:</span>
+    <button class="tbtn act" id="fua" onclick="setUF(0)">All</button>
+    <span id="ufbtns"></span>
+    <span class="tl" style="margin-left:8px">Sort:</span>
+    <button class="tbtn act" id="sc" onclick="setSort('chan')">Channel</button>
+    <button class="tbtn" id="su2" onclick="setSort('uni')">By Universe</button>
+  </div>
+
+  <div id="jumpbar">
+    <span class="tl">Chan:</span>
+    <input id="ji" type="number" min="1" max="1024" placeholder="1"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();doJump()}">
+    <button class="jbtn" onclick="doJump()">Go</button>
+    <span id="jinfo" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#555"></span>
+    <div style="flex:1"></div>
+    <span class="tl">Format:</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#30b8f0">Universe/Address &nbsp;e.g. 1/326 &nbsp;5/25</span>
+  </div>
+</div><!-- end controls-bar -->
+
+<!-- ══ PATCH VIEW ══════════════════════════════ -->
+
+<div class="view act" id="view-patch">
+  <div id="wrap">
+    <table>
+      <colgroup>
+        <col style="width:46px"><col style="width:120px"><col style="width:88px"><col style="width:190px"><col style="width:1fr">
+      </colgroup>
+      <thead><tr>
+        <th class="tc">Chan</th>
+        <th class="tc">Eos Addr<span class="th-sub">uni / addr — end</span></th>
+        <th class="tc">Venue Addr<span class="th-sub">uni / addr — end</span></th>
+        <th>Fixture Type</th>
+        <th>Label</th>
+      </tr></thead>
+      <tbody id="pb">
+        <tr><td colspan="6" style="text-align:center;padding:30px;font-family:JetBrains Mono,monospace;font-size:12px;color:#555">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end view-patch -->
+
+<!-- ══ EOS UNIVERSE MAP VIEW ══════════════════ -->
+
+<div class="view" id="view-eos">
+  <div id="umap-eos">
+    <div class="umap-legend">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#30b8f0;font-weight:700">EOS OUTPUT — Universe maps</span>
+      <div class="leg-i"><div class="leg-sw" style="background:#0e1e2e;border:1px solid #30b8f066"></div>Patched channel</div>
+      <div class="leg-i"><div class="leg-sw" style="background:#111118;border:1px solid #222"></div>Empty</div>
+
+```
+</div>
+<div class="umap-tabbar" id="eos-tabs"></div>
+<div class="ugrid-wrap" id="eos-content"><p class="umap-empty-msg">No Eos addresses patched yet.</p></div>
+```
+
+  </div>
+</div>
+
+<!-- ══ VENUE UNIVERSE MAP VIEW ════════════════ -->
+
+<div class="view" id="view-venue">
+  <div id="umap-venue">
+    <div class="umap-legend">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#30e878;font-weight:700">VENUE OUTPUT — Universe maps</span>
+      <div class="leg-i"><div class="leg-sw" style="background:#0e2018;border:1px solid #30e87866"></div>Patched channel</div>
+      <div class="leg-i"><div class="leg-sw" style="background:#111118;border:1px solid #222"></div>Empty</div>
+
+```
+</div>
+<div class="umap-tabbar" id="venue-tabs"></div>
+<div class="ugrid-wrap" id="venue-content"><p class="umap-empty-msg">No venue addresses patched yet.</p></div>
+```
+
+  </div>
+</div>
+
+<!-- STATS BAR -->
+
+<div id="sb">
+  <div class="ss">Patched: <b id="sp">0</b></div>
+  <div class="ss">Unpatched: <b id="su">1024</b></div>
+  <div class="ss">DMX addrs: <b id="sa">0</b></div>
+  <div class="ss">Venue universes: <b id="sv">0</b></div>
+  <div class="uleg" id="uleg"></div>
+</div>
+
+<!-- NAV STRIP -->
+
+<div id="nav">
+  <span class="nv" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲ Top</span>
+  <span class="nv" onclick="window.scrollBy({top:-(window.innerHeight*4.8),behavior:'smooth'})">Page Up</span>
+  <span class="nv" onclick="window.scrollBy({top:window.innerHeight*4.8,behavior:'smooth'})">Page Down</span>
+  <span class="nv" onclick="jumpFirst()">First Patched</span>
+  <span class="nv" onclick="jumpLast()">Last Patched</span>
+  <span class="nv" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">▼ Bottom</span>
+</div>
+
+<!-- hidden file inputs -->
+
+<input type="file" id="f-csv" accept=".csv" style="display:none" onchange="importEosCSV(event)">
+<input type="file" id="f-mvp" accept=".mvp,.json" style="display:none" onchange="openFile(event)">
+
+<div id="toast"></div>
+
+<script>
+// ── Fixture DB ────────────────────────────────
+// Loaded dynamically from fixtures.json (generated by parse_qlc_fixtures.py)
+// Falls back to built-in list if fixtures.json not found
+const FX_BUILTIN=[
+  {m:"Generic",n:"Dimmer",mode:"1ch",p:1},{m:"Generic",n:"Dimmer",mode:"2ch",p:2},
+  {m:"Generic",n:"Dimmer",mode:"4ch",p:4},{m:"Generic",n:"Dimmer",mode:"8ch",p:8},
+  {m:"Generic",n:"RGB",mode:"3ch",p:3},{m:"Generic",n:"RGBA",mode:"4ch",p:4},
+  {m:"Generic",n:"RGBW",mode:"4ch",p:4},{m:"Generic",n:"RGBAW",mode:"5ch",p:5},
+  {m:"Generic",n:"Moving Head",mode:"9ch",p:9},
+  {m:"Chauvet",n:"Maverick MK2 Spot",mode:"26ch",p:26},
+  {m:"Chauvet",n:"Maverick MK2 Wash",mode:"28ch",p:28},
+  {m:"Chauvet",n:"Rogue R2 Spot",mode:"16ch",p:16},
+  {m:"Clay Paky",n:"Sharpy",mode:"14ch",p:14},
+  {m:"Clay Paky",n:"A.leda B-EYE K10",mode:"42ch",p:42},
+  {m:"ETC",n:"ColorSource PAR",mode:"8ch",p:8},
+  {m:"ETC",n:"ColorSource PAR Direct",mode:"6ch",p:6},
+  {m:"ETC",n:"Source Four LED Lustr+",mode:"10ch",p:10},
+  {m:"GLP",n:"impression X4",mode:"16ch",p:16},
+  {m:"GLP",n:"JDC1",mode:"26ch",p:26},
+  {m:"Martin",n:"MAC Aura",mode:"27ch",p:27},
+  {m:"Martin",n:"MAC Quantum Wash",mode:"32ch",p:32},
+  {m:"Martin",n:"MAC Viper Performance",mode:"33ch",p:33},
+  {m:"Robe",n:"Robin Pointe",mode:"24ch",p:24},
+  {m:"Robe",n:"Robin Spiider",mode:"40ch",p:40},
+  {m:"Robe",n:"BMFL Spot",mode:"36ch",p:36},
+  {m:"Robe",n:"Robin LEDBeam 150",mode:"11ch",p:11},
+  {m:"Vari-Lite",n:"VL3500 Spot",mode:"31ch",p:31},
+  {m:"Vari-Lite",n:"VL6000 Beam",mode:"26ch",p:26},
+  {m:"SGM",n:"G-7 Spot",mode:"22ch",p:22},
+  {m:"Antari",n:"HZ-500 Hazer",mode:"2ch",p:2},
+  {m:"MDG",n:"Me Hazer",mode:"2ch",p:2},
+];
+FX_BUILTIN.forEach(function(f){f.s=(f.m+' '+f.n+' '+f.mode).toLowerCase();});
+
+let FXI = FX_BUILTIN; // Will be replaced when fixtures.json loads
+let fixtureLibraryLoaded = false;
+
+// Try to load fixtures.json from server
+async function loadFixtureLibrary() {
+  try {
+    const resp = await fetch('/fixtures.json');
+    if (!resp.ok) throw new Error('Not found');
+    const data = await resp.json();
+    FXI = data;
+    fixtureLibraryLoaded = true;
+    const el = document.getElementById('fx-status');
+    if (el) el.textContent = 'QLC+ library: ' + data.length.toLocaleString() + ' personalities loaded';
+    console.log('Fixture library loaded:', data.length, 'personalities');
+  } catch(e) {
+    const el = document.getElementById('fx-status');
+    if (el) el.textContent = 'Using built-in fixtures (' + FX_BUILTIN.length + '). Run parse_qlc_fixtures.py for full library.';
+    console.log('fixtures.json not found, using built-in list');
+  }
+}
+
+const UC = ['','#30b8f0','#e070f0','#30e878','#f0a030','#f03020','#ffff40','#ff80c0','#80ffff','#ffb040','#c0ff40'];
+function uc(u){ return UC[u] || '#aaa'; }
+
+// ── State ─────────────────────────────────────
+let CH = {};   // CH[n] = {label, eosAddr, fixMfr, fixName, fixMode, fixParams}
+let VP = {};   // VP[n] = {venueAddr}
+let currentFile = null;
+let flt = 'all', uft = 0;
+
+// ── Address parser ────────────────────────────
+function parseAddr(s) {
+  if (!s) return null;
+  const m = String(s).trim().match(/^(\d+)\/(\d+)$/);
+  if (!m) return null;
+  const u = parseInt(m[1]), a = parseInt(m[2]);
+  if (u < 1 || u > 64 || a < 1 || a > 512) return null;
+  return {uni:u, addr:a};
+}
+
+// ── Menu ──────────────────────────────────────
+function toggleMenu() {
+  const btn = document.getElementById('mbtn');
+  const drop = document.getElementById('mdrop');
+  const isOpen = drop.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  if (isOpen) {
+    setTimeout(() => document.addEventListener('click', closeMenu, {once:true}), 10);
+  }
+}
+function closeMenu() {
+  document.getElementById('mdrop').classList.remove('open');
+  document.getElementById('mbtn').classList.remove('open');
+}
+function menuDo(fn) {
+  closeMenu();
+  setTimeout(fn, 80);
+}
+
+// ── View tabs ─────────────────────────────────
+function showView(v) {
+  ['patch','eos','venue'].forEach(name => {
+    document.getElementById('view-'+name).classList.toggle('act', name===v);
+    document.getElementById('vt-'+name).classList.toggle('act', name===v);
+  });
+  const isPatch = v === 'patch';
+  document.getElementById('sb').style.display = isPatch ? '' : 'none';
+  document.getElementById('nav').style.display = isPatch ? '' : 'none';
+  if (v === 'eos')   buildEosMap();
+  if (v === 'venue') buildVenueMap();
+}
+
+// ── File ops ──────────────────────────────────
+function setFName(n) {
+  currentFile = n;
+  document.getElementById('fname').textContent = n || 'No file open';
+}
+function download(name) {
+  const data = {CH, VP, _v:1, _tool:'Multiverse Patcher'};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name; a.click();
+}
+function newPatch() {
+  if (!confirm('Start a new patch? Unsaved changes will be lost.')) return;
+  CH = {}; VP = {};
+  setFName('New patch — use Save As to name it');
+  buildTable();
+  showT('New patch created');
+}
+function openPatch() { document.getElementById('f-mvp').click(); }
+function openFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      CH = d.CH || {}; VP = d.VP || {};
+      setFName(f.name); buildTable(); showT('Opened: '+f.name);
+    } catch(err) { showT('Invalid file', true); }
+  };
+  r.readAsText(f, 'UTF-8'); e.target.value = '';
+}
+function saveAs() {
+  const sug = currentFile && !currentFile.startsWith('New')
+    ? currentFile.replace(/\.(mvp|json)$/i,'') : 'my_patch';
+  const n = prompt('Save as:', sug); if (!n) return;
+  const fname = n.replace(/\.(mvp|json)$/i,'') + '.mvp';
+  download(fname); setFName(fname); showT('Saved: '+fname);
+}
+function makeCopy() {
+  const sug = currentFile ? currentFile.replace(/\.(mvp|json)$/i,'')+'_copy' : 'patch_copy';
+  const n = prompt('Save copy as:', sug); if (!n) return;
+  const fname = n.replace(/\.(mvp|json)$/i,'') + '.mvp';
+  download(fname); showT('Copy saved: '+fname);
+}
+function autoSave() {
+  try { localStorage.setItem('mvp_as', JSON.stringify({CH, VP})); } catch(e) {}
+}
+
+// ── Channel data ──────────────────────────────
+function sCH(n, f, v) { if (!CH[n]) CH[n]={}; CH[n][f]=v; }
+function gVP(n) { return VP[n] || {venueAddr:''}; }
+function sVP(n, v) { if (!VP[n]) VP[n]={venueAddr:''}; VP[n].venueAddr=v; autoSave(); }
+
+// ── Build table ───────────────────────────────
+function buildTable() {
+  const body = document.getElementById('pb');
+  body.innerHTML = '';
+  const frag = document.createDocumentFragment();
+
+  for (let n = 1; n <= 1024; n++) {
+    const ch = CH[n] || {};
+    const vp = gVP(n);
+    const tr = document.createElement('tr');
+    tr.id = 'r'+n;
+
+    // Chan number
+    const tdN = document.createElement('td');
+    tdN.className = 'c-num'; tdN.textContent = n;
+    tdN.addEventListener('click', (function(nn){ return function(){ scrollToRow(nn); }; })(n));
+    tr.appendChild(tdN);
+
+    // Eos addr + end (combined cell)
+    const tdEA = document.createElement('td');
+    tdEA.style.position = 'relative';
+    const eaI = document.createElement('input');
+    eaI.className = 'ai'; eaI.placeholder = 'U/Addr'; eaI.spellcheck = false;
+    eaI.id = 'ea'+n; eaI.value = ch.eosAddr || '';
+    if (ch.eosAddr) eaI.classList.add('ef');
+    eaI.addEventListener('change', (function(nn){ return function() {
+      const v = this.value.trim();
+      if (v && !parseAddr(v)) { showT('Use U/Addr e.g. 1/326', true); return; }
+      sCH(nn, 'eosAddr', v); updRow(nn); autoSave();
+    }; })(n));
+    const eaEnd = document.createElement('div');
+    eaEnd.id = 'ee'+n;
+    eaEnd.style.cssText = 'font-family:JetBrains Mono,monospace;font-size:9px;color:#555;text-align:center;line-height:1';
+    tdEA.appendChild(eaI); tdEA.appendChild(eaEnd); tr.appendChild(tdEA);
+
+    // Venue addr
+    const tdVA = document.createElement('td');
+    tdVA.style.position = 'relative';
+    const vaI = document.createElement('input');
+    vaI.className = 'ai'; vaI.placeholder = 'U/Addr'; vaI.spellcheck = false;
+    vaI.id = 'va'+n; vaI.value = vp.venueAddr || '';
+    if (vp.venueAddr) { vaI.classList.add('vf'); const vpa=parseAddr(vp.venueAddr); if(vpa){vaI.style.color=uc(vpa.uni);vaI.style.borderColor=uc(vpa.uni)+'44';} }
+    vaI.addEventListener('change', (function(nn){ return function() {
+      const v = this.value.trim();
+      if (v && !parseAddr(v)) { showT('Use U/Addr e.g. 5/25', true); return; }
+      sVP(nn, v); updRow(nn); updStats(); updUFBtns(); applyFlt();
+    }; })(n));
+    const vaEnd = document.createElement('div');
+    vaEnd.id = 've'+n;
+    vaEnd.style.cssText = 'font-family:JetBrains Mono,monospace;font-size:9px;text-align:center;line-height:1';
+    tdVA.appendChild(vaI); tdVA.appendChild(vaEnd); tr.appendChild(tdVA);
+
+    // Fixture type (autocomplete)
+    const tdF = document.createElement('td');
+    const fw = document.createElement('div'); fw.className = 'fw';
+    const fI = document.createElement('input');
+    fI.className = 'fi'; fI.placeholder = 'Type to search fixtures...';
+    fI.id = 'fi'+n;
+    fI.value = ch.fixName ? (ch.fixMfr ? ch.fixMfr+' - '+ch.fixName : ch.fixName) : '';
+    const dr = document.createElement('div'); dr.className = 'acdrop'; dr.id = 'dr'+n;
+    document.body.appendChild(dr); // attach to body so it's never clipped by table
+    fI.addEventListener('input', (function(nn, fi, d){ return function(){ showAC(nn,fi,d); }; })(n,fI,dr));
+    fI.addEventListener('focus', (function(nn, fi, d){ return function(){ showAC(nn,fi,d); }; })(n,fI,dr));
+    fI.addEventListener('blur', function(){ setTimeout(function(){ dr.classList.remove('open'); }, 200); });
+    fw.appendChild(fI); tdF.appendChild(fw); tr.appendChild(tdF);
+
+    // Label
+    const tdL = document.createElement('td');
+    const lI = document.createElement('input');
+    lI.className = 'li'; lI.placeholder = 'Label...';
+    lI.value = ch.label || '';
+    lI.addEventListener('change', (function(nn){ return function(){
+      sCH(nn, 'label', this.value); updRow(nn); autoSave();
+    }; })(n));
+    tdL.appendChild(lI); tr.appendChild(tdL);
+
+    updRowEl(n, tr, ch, vp);
+    frag.appendChild(tr);
+  }
+
+  body.appendChild(frag);
+  updStats(); applyFlt(); updUFBtns();
+}
+
+function updRow(n) {
+  const tr = document.getElementById('r'+n); if (!tr) return;
+  updRowEl(n, tr, CH[n]||{}, gVP(n));
+}
+
+function updRowEl(n, tr, ch, vp) {
+  const vpa = parseAddr(vp.venueAddr);
+  const epa = parseAddr(ch.eosAddr);
+  const isUsed = !!(ch.label || ch.eosAddr || vp.venueAddr);
+  tr.classList.toggle('used', isUsed);
+  const tdN = tr.querySelector('.c-num'); if (tdN) tdN.classList.toggle('on', isUsed);
+
+  // Eos addr styling + end address
+  const eaEl = document.getElementById('ea'+n);
+  if (eaEl) { eaEl.classList.toggle('ef', !!epa); }
+  const eeEl = document.getElementById('ee'+n);
+  if (eeEl) {
+    const p = ch.fixParams || 1;
+    if (epa && p > 1) {
+      eeEl.textContent = '→ '+epa.uni+'/'+(epa.addr+p-1);
+      eeEl.style.color = '#30b8f066';
+    } else {
+      eeEl.textContent = '';
+    }
+  }
+
+  // Venue addr styling + end address
+  const vaEl = document.getElementById('va'+n);
+  if (vaEl) {
+    vaEl.classList.toggle('vf', !!vpa);
+    if (vpa) { vaEl.style.color = uc(vpa.uni); vaEl.style.borderColor = uc(vpa.uni)+'44'; }
+    else { vaEl.style.color = ''; vaEl.style.borderColor = ''; }
+  }
+  const veEl = document.getElementById('ve'+n);
+  if (veEl) {
+    const p = ch.fixParams || 1;
+    if (vpa && p > 1) {
+      veEl.textContent = '→ '+vpa.uni+'/'+(vpa.addr+p-1);
+      veEl.style.color = uc(vpa.uni)+'99';
+    } else {
+      veEl.textContent = '';
+    }
+  }
+
+  // Fixture field - populate from imported data
+  const fiEl = document.getElementById('fi'+n);
+  if (fiEl && !fiEl.value && ch.fixName) {
+    fiEl.value = ch.fixMfr ? ch.fixMfr+' - '+ch.fixName : ch.fixName;
+  }
+}
+
+// ── Autocomplete ──────────────────────────────
+function showAC(n, inp, drop) {
+  // Position using fixed coords so it always appears above table rows
+  const rect = inp.getBoundingClientRect();
+  drop.style.left = rect.left + 'px';
+  drop.style.top  = (rect.bottom + 2) + 'px';
+  drop.style.width = Math.max(360, rect.width) + 'px';
+
+  const q = inp.value.toLowerCase().trim();
+  let res;
+  if (!q) {
+    res = FXI.slice(0, 20);
+  } else {
+    const scored = [];
+    for (let i = 0; i < FXI.length; i++) {
+      const f = FXI[i];
+      if (!f.s.includes(q)) continue;
+      const score = f.n.toLowerCase().includes(q) ? 0 : 1;
+      scored.push({f, score, i});
+      if (scored.length >= 200) break;
+    }
+    scored.sort(function(a,b){ return a.score-b.score || a.i-b.i; });
+    res = scored.slice(0,25).map(function(s){ return s.f; });
+  }
+  drop.innerHTML = '';
+  if (!res.length) {
+    drop.innerHTML = '<div class="acnone">No matches</div>';
+    drop.classList.add('open'); return;
+  }
+  res.forEach(function(f) {
+    const d = document.createElement('div'); d.className = 'acitem';
+    const modeStr = f.mode ? ' <span class="acmode">'+f.mode+'</span>' : '';
+    d.innerHTML = '<span class="acmfr">'+f.m+'</span>'+f.n+modeStr+'<span class="acch">'+f.p+'ch</span>';
+    d.addEventListener('mousedown', (function(ff){ return function(ev) {
+      ev.preventDefault();
+      inp.value = ff.m + ' - ' + ff.n + (ff.mode ? ' ['+ff.mode+']' : '');
+      drop.classList.remove('open');
+      sCH(n, 'fixMfr', ff.m);
+      sCH(n, 'fixName', ff.n);
+      sCH(n, 'fixMode', ff.mode || '');
+      sCH(n, 'fixParams', ff.p);
+      updRow(n); autoSave();
+    }; })(f));
+    drop.appendChild(d);
+  });
+  drop.classList.add('open');
+}
+
+// Close all dropdowns on scroll
+window.addEventListener('scroll', function() {
+  document.querySelectorAll('.acdrop.open').forEach(function(d){ d.classList.remove('open'); });
+}, true);
+
+// ── Filter ────────────────────────────────────
+function setF(f) {
+  flt = f;
+  ['fa','fu','fn'].forEach(id => document.getElementById(id).classList.remove('act'));
+  document.getElementById(f==='all'?'fa':f==='used'?'fu':'fn').classList.add('act');
+  applyFlt();
+}
+function setUF(u) {
+  uft = u;
+  document.getElementById('fua').classList.toggle('act', u===0);
+  document.querySelectorAll('.ufb').forEach(b => b.classList.toggle('act', parseInt(b.dataset.u)===u));
+  applyFlt();
+}
+
+// Sort state
+let sortMode = 'chan';
+function setSort(s) {
+  sortMode = s;
+  ['sc','su2'].forEach(id => document.getElementById(id).classList.remove('act'));
+  document.getElementById(s==='chan'?'sc':'su2').classList.add('act');
+  applySort();
+}
+function applySort() {
+  const body = document.getElementById('pb');
+  const rows = Array.from(body.querySelectorAll('tr[id^="r"]'));
+  if (sortMode === 'uni') {
+    rows.sort(function(a, b) {
+      const na = parseInt(a.id.slice(1));
+      const nb = parseInt(b.id.slice(1));
+      const vpa = parseAddr(gVP(na).venueAddr);
+      const vpb = parseAddr(gVP(nb).venueAddr);
+      const epa = parseAddr((CH[na]||{}).eosAddr);
+      const epb = parseAddr((CH[nb]||{}).eosAddr);
+      // Sort by venue universe first, then eos universe, then channel
+      const vu_a = vpa ? vpa.uni : 999;
+      const vu_b = vpb ? vpb.uni : 999;
+      if (vu_a !== vu_b) return vu_a - vu_b;
+      const va_a = vpa ? vpa.addr : 9999;
+      const va_b = vpb ? vpb.addr : 9999;
+      if (va_a !== va_b) return va_a - va_b;
+      return na - nb;
+    });
+  } else {
+    rows.sort(function(a, b) {
+      return parseInt(a.id.slice(1)) - parseInt(b.id.slice(1));
+    });
+  }
+  rows.forEach(function(r) { body.appendChild(r); });
+  applyFlt(); // re-apply visibility after sort
+}
+
+// Universe map filters
+let eosMFlt = 'all', venueMFlt = 'all';
+function setEosFilter(f) {
+  eosMFlt = f;
+  ['eos-fa','eos-fu','eos-fn'].forEach(id => document.getElementById(id).classList.remove('act'));
+  document.getElementById(f==='all'?'eos-fa':f==='used'?'eos-fu':'eos-fn').classList.add('act');
+  buildEosMap();
+}
+function setVenueFilter(f) {
+  venueMFlt = f;
+  ['venue-fa','venue-fu','venue-fn'].forEach(id => document.getElementById(id).classList.remove('act'));
+  document.getElementById(f==='all'?'venue-fa':f==='used'?'venue-fu':'venue-fn').classList.add('act');
+  buildVenueMap();
+}
+
+function applyFlt() {
+  for (let n = 1; n <= 1024; n++) {
+    const tr = document.getElementById('r'+n); if (!tr) continue;
+    const ch = CH[n]||{}; const vp = gVP(n);
+    const isUsed = !!(ch.label || ch.eosAddr || vp.venueAddr);
+    let show = true;
+    if (flt==='used' && !isUsed) show = false;
+    if (flt==='none' && isUsed) show = false;
+    if (uft !== 0) { const vpa = parseAddr(vp.venueAddr); if (!vpa || vpa.uni !== uft) show = false; }
+    tr.style.display = show ? '' : 'none';
+  }
+}
+function updUFBtns() {
+  const univs = new Set();
+  for (let n=1;n<=1024;n++) { const vpa=parseAddr(gVP(n).venueAddr); if(vpa) univs.add(vpa.uni); }
+  const wrap = document.getElementById('ufbtns'); wrap.innerHTML = '';
+  [...univs].sort((a,b)=>a-b).forEach(function(u) {
+    const b = document.createElement('button');
+    b.className = 'tbtn ufb'+(uft===u?' act':''); b.dataset.u = u; b.textContent = 'U'+u;
+    b.style.color = uc(u); if(uft===u) b.style.borderColor = uc(u);
+    b.addEventListener('click', (function(uu){ return function(){ setUF(uu); }; })(u));
+    wrap.appendChild(b);
+  });
+}
+
+// ── Stats ─────────────────────────────────────
+function updStats() {
+  let pat=0, addrs=0; const univs=new Set();
+  for (let n=1;n<=1024;n++) {
+    const vpa = parseAddr(gVP(n).venueAddr);
+    if (vpa) { pat++; addrs+=(CH[n]&&CH[n].fixParams)||1; univs.add(vpa.uni); }
+  }
+  document.getElementById('sp').textContent = pat;
+  document.getElementById('su').textContent = 1024-pat;
+  document.getElementById('sa').textContent = addrs;
+  document.getElementById('sv').textContent = univs.size;
+  const leg = document.getElementById('uleg'); leg.innerHTML='';
+  [...univs].sort((a,b)=>a-b).forEach(function(u) {
+    const d=document.createElement('div'); d.className='ulegitem';
+    d.innerHTML='<div class="udot" style="background:'+uc(u)+'"></div><span style="color:'+uc(u)+';font-size:9px">U'+u+'</span>';
+    leg.appendChild(d);
+  });
+}
+
+// ── Jump ──────────────────────────────────────
+function doJump() {
+  const n = parseInt(document.getElementById('ji').value);
+  if (!n || n<1 || n>1024) { showT('Enter 1–1024', true); return; }
+  if (flt !== 'all') setF('all');
+  scrollToRow(n);
+  const tr = document.getElementById('r'+n);
+  if (tr) { tr.classList.add('hl'); setTimeout(function(){ tr.classList.remove('hl'); }, 2000); }
+  const ch = CH[n];
+  document.getElementById('jinfo').textContent = 'Ch'+n+': '+(ch&&ch.label?ch.label:'empty');
+}
+function scrollToRow(n) {
+  const tr = document.getElementById('r'+n);
+  if (tr) tr.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function jumpFirst() {
+  for (let n=1;n<=1024;n++) { if (gVP(n).venueAddr) { scrollToRow(n); return; } }
+  showT('No patched channels', true);
+}
+function jumpLast() {
+  for (let n=1024;n>=1;n--) { if (gVP(n).venueAddr) { scrollToRow(n); return; } }
+  showT('No patched channels', true);
+}
+
+// ── Universe maps ─────────────────────────────
+function buildGrid(container, uNum, addrMap, color, mapFilter) {
+  container.innerHTML = '';
+  const used = Object.keys(addrMap).length;
+
+  const title = document.createElement('div'); title.className='umap-utitle'; title.style.color=color;
+  title.textContent = 'Universe ' + uNum; container.appendChild(title);
+  const sub = document.createElement('div'); sub.className='umap-usub';
+  sub.textContent = used+' of 512 addresses in use · '+(512-used)+' free'; container.appendChild(sub);
+
+  const grid = document.createElement('div'); grid.className='ugrid';
+  // corner
+  grid.appendChild(Object.assign(document.createElement('div'),{className:'ugh'}));
+  // col headers 1-32
+  for (let c=1;c<=32;c++) { const h=document.createElement('div');h.className='ugh';h.textContent=c;grid.appendChild(h); }
+  // rows
+  for (let row=0;row<16;row++) {
+    const rl=document.createElement('div');rl.className='ugh';rl.style.justifyContent='flex-end';rl.style.paddingRight='3px';rl.style.color='#555';
+    rl.textContent=(row*32+1); grid.appendChild(rl);
+    for (let col=0;col<32;col++) {
+      const addr=row*32+col+1;
+      const cell=document.createElement('div'); cell.className='ugc';
+      const info=addrMap[addr];
+      const isFilled = !!info;
+      // Apply filter
+      if (mapFilter==='used' && !isFilled) { cell.classList.add('empty'); cell.style.opacity='0.2'; grid.appendChild(cell); continue; }
+      if (mapFilter==='none' && isFilled)  { cell.classList.add('empty'); cell.style.opacity='0.2'; grid.appendChild(cell); continue; }
+      if (isFilled) {
+        cell.classList.add('filled');
+        cell.style.background=color+'28'; cell.style.borderColor=color+'88'; cell.style.color=color;
+        cell.textContent=info.chan;
+        const tt=document.createElement('div'); tt.className='ugtt';
+        tt.innerHTML='<b>Addr '+addr+'</b> · Ch'+info.chan+(info.label?' · <b>'+info.label+'</b>':'')+(info.type?'<br><span style="color:#888">'+info.type+'</span>':'');
+        cell.appendChild(tt);
+      } else {
+        cell.classList.add('empty');
+        // Show addr number very faintly for reference
+        if (addr % 32 === 1) { cell.style.color='#2a2a2a'; cell.textContent=addr; }
+      }
+      grid.appendChild(cell);
+    }
+  }
+  container.appendChild(grid);
+}
+
+function buildEosMap() {
+  const universes = {};
+  for (let n=1;n<=1024;n++) {
+    const ch=CH[n]; if(!ch||!ch.eosAddr) continue;
+    const ep=parseAddr(ch.eosAddr); if(!ep) continue;
+    if(!universes[ep.uni]) universes[ep.uni]={};
+    for (let p=0;p<(ch.fixParams||1);p++) {
+      const a=ep.addr+p; if(a>512) break;
+      universes[ep.uni][a]={chan:n,label:ch.label||'',type:ch.fixMfr?ch.fixMfr+' '+ch.fixName:''};
+    }
+  }
+  const tabs=document.getElementById('eos-tabs');
+  const content=document.getElementById('eos-content');
+  tabs.innerHTML=''; content.innerHTML='';
+  const nums=Object.keys(universes).map(Number).sort((a,b)=>a-b);
+  if(!nums.length){content.innerHTML='<p class="umap-empty-msg">No Eos addresses patched yet.</p>';return;}
+  let active=nums[0];
+  function renderEos(u){
+    active=u;
+    tabs.querySelectorAll('.umaptab').forEach(b=>b.classList.toggle('act',parseInt(b.dataset.u)===u));
+    buildGrid(content,u,universes[u],'#30b8f0',eosMFlt);
+  }
+  nums.forEach(function(u){
+    const b=document.createElement('button');b.className='umaptab'+(u===active?' act':'');
+    b.dataset.u=u;b.textContent='Eos U'+u;
+    if(u===active){b.style.borderColor='#30b8f0';b.style.color='#30b8f0';}
+    b.addEventListener('click',(function(uu){return function(){renderEos(uu);};})(u));
+    tabs.appendChild(b);
+  });
+  renderEos(active);
+}
+
+function buildVenueMap() {
+  const universes={};
+  for (let n=1;n<=1024;n++) {
+    const vp=gVP(n); if(!vp.venueAddr) continue;
+    const vpa=parseAddr(vp.venueAddr); if(!vpa) continue;
+    const ch=CH[n]||{};
+    if(!universes[vpa.uni]) universes[vpa.uni]={};
+    for (let p=0;p<(ch.fixParams||1);p++) {
+      const a=vpa.addr+p; if(a>512) break;
+      universes[vpa.uni][a]={chan:n,label:ch.label||'',type:ch.fixMfr?ch.fixMfr+' '+ch.fixName:''};
+    }
+  }
+  const tabs=document.getElementById('venue-tabs');
+  const content=document.getElementById('venue-content');
+  tabs.innerHTML=''; content.innerHTML='';
+  const nums=Object.keys(universes).map(Number).sort((a,b)=>a-b);
+  if(!nums.length){content.innerHTML='<p class="umap-empty-msg">No venue addresses patched yet.</p>';return;}
+  let active=nums[0];
+  function renderVenue(u){
+    active=u;
+    const col=uc(u);
+    tabs.querySelectorAll('.umaptab').forEach(b=>b.classList.toggle('act',parseInt(b.dataset.u)===u));
+    buildGrid(content,u,universes[u],col,venueMFlt);
+  }
+  nums.forEach(function(u){
+    const col=uc(u);
+    const b=document.createElement('button');b.className='umaptab'+(u===active?' act':'');
+    b.dataset.u=u;b.textContent='Venue U'+u;
+    if(u===active){b.style.borderColor=col;b.style.color=col;}
+    b.addEventListener('click',(function(uu){return function(){renderVenue(uu);};})(u));
+    tabs.appendChild(b);
+  });
+  renderVenue(active);
+}
+
+// ── Eos CSV import ────────────────────────────
+function importEosTrigger(){ document.getElementById('f-csv').click(); }
+function importEosCSV(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=function(ev){
+    try{
+      const lines=ev.target.result.split(/\r?\n/);
+      let hdrIdx=-1,hdr=[];
+      for(let i=0;i<Math.min(20,lines.length);i++){
+        const cols=parseCSV(lines[i]).map(c=>c.toLowerCase().trim());
+        if(cols.some(c=>c==='chan'||c==='channel')){hdrIdx=i;hdr=cols;break;}
+      }
+      if(hdrIdx<0){showT('No Chan column found',true);return;}
+      const ci=function(names){return names.map(function(n){return hdr.indexOf(n);}).find(function(i){return i>=0;})??-1;};
+      const iC=ci(['chan','channel']);
+      const iA=ci(['address','addr','dimmer','patch']);
+      const iT=ci(['fixture_type','fixture type','type','device type','personality']);
+      const iL=ci(['label','text 1','text1','name','notes','purpose','text','note']);
+      // Debug: log what columns we found
+      console.log('CSV columns:', hdr);
+      console.log('Chan col:', iC, 'Addr col:', iA, 'Type col:', iT, 'Label col:', iL);
+      if(iC<0){showT('No Chan column found in CSV',true);return;}
+      if(iA<0){showT('No Address column found in CSV',true);return;}
+      let imported=0;const seen=new Set();
+      for(let i=hdrIdx+1;i<lines.length;i++){
+        const line=lines[i].trim(); if(!line) continue;
+        const cols=parseCSV(line);
+        const chan=parseInt((cols[iC]||'').trim());
+        if(!chan||chan<1||chan>1024) continue;
+        if(seen.has(chan)) continue; seen.add(chan);
+        const addrRaw=(cols[iA]||'').trim();
+        const typeRaw=iT>=0?(cols[iT]||'').trim():'';
+        const labelRaw=iL>=0?(cols[iL]||'').trim():'';
+        let addrStr='';
+        if(addrRaw){
+          // Eos format can be "2/271<276" (start<end) - strip the end part
+          const addrClean = addrRaw.split('<')[0].trim();
+          if(addrClean.includes('/')){
+            const p=addrClean.split('/');const u=parseInt(p[0]),a=parseInt(p[1]);
+            if(u>=1&&u<=64&&a>=1&&a<=512)addrStr=u+'/'+a;
+          } else {
+            const abs=parseInt(addrClean);
+            if(abs>=1){const u=Math.ceil(abs/512),a=abs-(u-1)*512;addrStr=u+'/'+a;}
+          }
+        }
+        if(!CH[chan])CH[chan]={};
+        if(addrStr)CH[chan].eosAddr=addrStr;
+        if(labelRaw)CH[chan].label=labelRaw;
+        if(typeRaw){
+          const tl=typeRaw.toLowerCase().trim();
+          // For generic types like 'Dimmer', 'LED', 'Moving Head' — store as-is
+          // Only auto-match if type string is specific enough (>8 chars)
+          // to avoid false matches like 'Dimmer' -> 'BT Theatre 100EC'
+          let matched = false;
+          if(tl.length > 8){
+            const m=FXI.find(function(f){return f.s.includes(tl)||tl.includes(f.n.toLowerCase());});
+            if(m){CH[chan].fixMfr=m.m;CH[chan].fixName=m.n;CH[chan].fixMode=m.mode||'';CH[chan].fixParams=m.p;matched=true;}
+          }
+          if(!matched){CH[chan].fixMfr='';CH[chan].fixName=typeRaw;CH[chan].fixMode='';CH[chan].fixParams=1;}
+        }
+        imported++;
+      }
+      buildTable();
+      showT('Imported '+imported+' channels'+(iL<0?' (no label column found)':''));
+    }catch(err){showT('Error: '+err.message,true);}
+  };
+  r.readAsText(f,'UTF-8'); e.target.value='';
+}
+function parseCSV(line){
+  const r=[];let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(c===','&&!inQ){r.push(cur);cur='';}else cur+=c;}
+  r.push(cur);return r;
+}
+
+// ── QLC+ Generator ────────────────────────────
+function genQLC(){
+  const pat=[];
+  for(let n=1;n<=1024;n++){
+    const vp=gVP(n);const vpa=parseAddr(vp.venueAddr);
+    if(vpa)pat.push({n,ch:CH[n]||{},vpa});
+  }
+  if(!pat.length){showT('No channels patched',true);return;}
+
+  // Check for conflicts before generating
+  const addrCheck={};
+  let conflicts=0;
+  pat.forEach(function(p){
+    const key=p.vpa.uni+'/'+p.vpa.addr;
+    if(addrCheck[key]){conflicts++;} else {addrCheck[key]=p.n;}
+  });
+  if(conflicts>0){
+    if(!confirm(conflicts+' address conflict(s) detected. Generate anyway?')) return;
+  }
+
+  const vUs=new Set(pat.map(p=>p.vpa.uni));
+  const eUs=new Set();
+  pat.forEach(function(p){const ep=parseAddr(p.ch.eosAddr);eUs.add(ep?ep.uni:1);});
+
+  // Build fixture XML with proper personality data
+  let fx='';
+  pat.forEach(function(p,i){
+    const ch=p.ch;
+    const lbl=ch.label||('Chan '+p.n);
+    const pms=(ch.fixParams)||1;
+    const mfr=ch.fixMfr||'Generic';
+    const mdl=ch.fixName||'Dimmer';
+    const mode=ch.fixMode||'';
+
+    // Build Mode element - QLC+ uses this to match personality
+    const modeEl = mode
+      ? '\n   <Mode>'+x(mode)+'</Mode>'
+      : '';
+
+    fx+='  <Fixture ID="'+(i+1)+'"'+
+      ' Universe="'+(p.vpa.uni-1)+'"'+
+      ' Address="'+(p.vpa.addr-1)+'"'+
+      ' Channels="'+pms+'"'+
+      ' Name="'+x(lbl)+' (Ch'+p.n+')"'+
+      ' Manufacturer="'+x(mfr)+'"'+
+      ' Model="'+x(mdl)+'"'+
+      '>'+modeEl+'\n  </Fixture>\n';
+  });
+
+  // Build universe I/O map
+  let ui='';let uid=0;
+  [...eUs].sort((a,b)=>a-b).forEach(function(eu){
+    ui+='  <Universe Name="Eos Universe '+eu+'" ID="'+uid+'" PassthroughMode="False">\n';
+    ui+='    <Input Plugin="E1.31" UID="2.0.0.2" Line="2"/>\n';
+    ui+='  </Universe>\n';
+    uid++;
+  });
+  [...vUs].sort((a,b)=>a-b).forEach(function(vu){
+    ui+='  <Universe Name="Venue Universe '+vu+'" ID="'+uid+'" PassthroughMode="False">\n';
+    ui+='    <Output Plugin="E1.31" UID="2.0.0.2" Line="2"/>\n';
+    ui+='  </Universe>\n';
+    uid++;
+  });
+
+  const date=new Date().toISOString().slice(0,10);
+  const fname=(currentFile||'venue').replace(/\.(mvp|json)$/i,'').replace(/[^a-z0-9_-]/gi,'_');
+
+  const qxw=[
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<!DOCTYPE Workspace>',
+    '<Workspace xmlns="http://www.qlcplus.org/Workspace" CurrentWindow="InputOutput">',
+    ' <Creator>',
+    '  <Name>Multiverse Patcher</Name>',
+    '  <Version>5.0</Version>',
+    '  <Author>Generated '+date+(currentFile?' from '+currentFile:'')+'</Author>',
+    ' </Creator>',
+    ' <Engine>',
+    '  <InputOutputMap>',
+    ui+'  </InputOutputMap>',
+    '  <Fixtures>',
+    fx+'  </Fixtures>',
+    '  <Functions/>',
+    ' </Engine>',
+    ' <VirtualConsole><Frame><Appearance>',
+    '  <FrameStyle>None</FrameStyle>',
+    '  <ForegroundColor>Default</ForegroundColor>',
+    '  <BackgroundColor>Default</BackgroundColor>',
+    '  <BackgroundImage>None</BackgroundImage>',
+    '  <Font>Default</Font>',
+    ' </Appearance></Frame></VirtualConsole>',
+    '</Workspace>'
+  ].join('\n');
+
+  const blob=new Blob([qxw],{type:'application/xml'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fname+'_patch.qxw';
+  a.click();
+  showT('Generated '+fname+'_patch.qxw — '+pat.length+' fixtures');
+}
+
+// ── Report ────────────────────────────────────
+function genReport(){
+  const date=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const rows=[];
+  for(let n=1;n<=1024;n++){const ch=CH[n];if(ch&&(ch.label||ch.eosAddr)){rows.push({n,ch,vp:gVP(n)});}}
+  let trs='';
+  rows.forEach(function(r){
+    const vp=r.vp;const ch=r.ch;const p=(ch.fixParams)||1;
+    const vpa=parseAddr(vp.venueAddr);const epa=parseAddr(ch.eosAddr);
+    const end=vpa&&p>1?vpa.uni+'/'+(vpa.addr+p-1):'';
+    const col=vpa?uc(vpa.uni):'#888';
+    trs+='<tr><td class="n">'+r.n+'</td><td style="color:#1060c0;font-family:monospace">'+(epa?epa.uni+'/'+epa.addr:'')+'</td><td>'+(ch.fixMfr?ch.fixMfr+' '+ch.fixName:'')+'</td><td>'+(ch.label||'')+'</td><td style="color:'+col+';font-weight:700;font-family:monospace">'+(vpa?vpa.uni+'/'+vpa.addr:'')+'</td><td style="color:'+col+';font-family:monospace">'+end+'</td></tr>';
+  });
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Patch Report</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:16px}h1{font-size:16px;color:#b06000;margin-bottom:3px}.sub{font-size:10px;color:#999;margin-bottom:12px}.stats{display:flex;gap:14px;margin-bottom:12px;padding:8px;background:#f5f5f5;border-radius:4px}.st{font-size:10px}.st b{font-size:13px;color:#b06000;display:block}table{width:100%;border-collapse:collapse}th{background:#222;color:#fff;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:5px 6px;text-align:left}td{padding:3px 6px;border-bottom:1px solid #eee}td.n{font-weight:700;font-size:12px;color:#b06000;text-align:center;width:40px}tr:nth-child(even){background:#f8f8f8}.footer{margin-top:14px;font-size:9px;color:#bbb;text-align:center}@media print{.footer{position:fixed;bottom:0;width:100%}}</style></head><body><h1>Patch Report</h1><div class="sub">'+date+' &nbsp;|&nbsp; Multiverse Patcher</div><div class="stats"><div class="st"><b>'+rows.length+'</b>Channels Used</div><div class="st"><b>'+rows.filter(function(r){return parseAddr(gVP(r.n).venueAddr);}).length+'</b>Patched to Venue</div></div><table><thead><tr><th>Chan</th><th>Eos Addr</th><th>Fixture Type</th><th>Label</th><th>Venue Addr</th><th>End</th></tr></thead><tbody>'+trs+'</tbody></table><div class="footer">Cmd+P to save as PDF</div><script>window.onload=function(){window.print();}<\/script></body></html>';
+
+const w=window.open('','_blank');w.document.write(html);w.document.close();
+}
+
+function x(s){return String(s||'').replace(/&/g,'&').replace(/"/g,'"').replace(/</g,'<').replace(/>/g,'>');}
+
+// ── Toast ─────────────────────────────────────
+let toastTm=null;
+function showT(msg,err){
+const t=document.getElementById('toast');
+t.textContent=msg; t.className='toast'+(err?' err':'')+' show';
+if(toastTm)clearTimeout(toastTm);
+toastTm=setTimeout(function(){t.className='toast'+(err?' err':'');},3000);
+}
+
+// ── Init ──────────────────────────────────────
+try {
+const s = localStorage.getItem('mvp_as');
+if (s) { const d = JSON.parse(s); CH = d.CH||{}; VP = d.VP||{}; setFName('Autosave restored'); }
+} catch(e) { }
+
+// Load fixture library then build table
+loadFixtureLibrary().finally(function() {
+try { buildTable(); } catch(e) {
+console.error('buildTable error:', e);
+document.getElementById('pb').innerHTML =
+'<tr><td colspan="5" style="color:#f03020;padding:20px;font-family:JetBrains Mono,monospace">Error: '+e.message+'</td></tr>';
+}
+});
+</script>
+
+</body>
+</html>
